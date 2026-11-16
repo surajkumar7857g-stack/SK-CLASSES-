@@ -26,17 +26,14 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        // 100% Working Popup Login
         window.handleGoogleLogin = function() {
             signInWithPopup(auth, provider).then((result) => {
                 checkVipStatus(result.user);
             }).catch((error) => {
-                alert("लॉगिन में दिक्कत आ रही है: " + error.message);
                 console.error("Popup Login Error", error);
             });
         };
 
-        // Skip/Guest Mode for instant access
         window.continueAsGuest = function() {
             document.getElementById('loginModal').style.display = 'none';
             document.getElementById('userEmailDisplay').innerText = "Guest Student";
@@ -88,8 +85,18 @@
         .user-info { display: flex; align-items: center; gap: 10px; font-size: 14px; }
         .logout-btn { background: #ff4d4d; border: none; padding: 5px 10px; color: white; border-radius: 4px; cursor: pointer; }
         
-        .main-container { flex: 1; display: flex; flex-direction: column; width: 100%; height: calc(100vh - 60px); }
-        iframe { flex: 1; width: 100%; border: none; background: #fff; }
+        .main-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; background: #000d1a; }
+        
+        .study-card {
+            background: #001f3f; padding: 30px; border-radius: 15px; border: 2px solid #00ff88;
+            max-width: 400px; width: 100%; box-shadow: 0 0 25px rgba(0, 255, 136, 0.2);
+        }
+        .study-card h1 { color: #00ff88; font-size: 24px; margin-bottom: 15px; }
+        .study-card p { color: #ccc; font-size: 14px; margin-bottom: 25px; }
+        .target-btn {
+            display: inline-block; background: #00ff88; color: #000; padding: 15px 25px; font-size: 18px;
+            font-weight: bold; text-decoration: none; border-radius: 8px; width: 100%; box-shadow: 0 4px 15px rgba(0,255,136,0.4);
+        }
 
         /* Login Modal Overlay */
         #loginModal {
@@ -150,9 +157,10 @@
         </div>
     </header>
 
-    <!-- Main App Content -->
+    <!-- Main Content Area (Fixed Iframe Error) -->
     <div class="main-container">
-        <div id="adContainer" style="text-align:center; background:#111; padding:5px;">
+        <!-- Adsterra Ad Banner -->
+        <div id="adContainer" style="margin-bottom: 20px; text-align:center;">
             <script type="text/javascript">
                 atOptions = {
                     'key' : '32282661',
@@ -165,7 +173,11 @@
             <script type="text/javascript" src="//asiafilm.org/4/4b7fbdede7b9efc77b75feac076153a9/invoke.js"></script>
         </div>
 
-        <iframe src="https://gb-study-targetboard.ai.studio/"></iframe>
+        <div class="study-card">
+            <h1>Target Board Study</h1>
+            <p>कक्षा 10वीं और 11वीं के सभी नोट्स, क्विज़ और स्टडी मटीरियल यहाँ से एक्सेस करें।</p>
+            <a href="https://gb-study-targetboard.ai.studio/" target="_blank" class="target-btn">🚀 Target Board खोलें</a>
+        </div>
     </div>
 
     <!-- VIP Upgrade Bottom Bar -->
@@ -192,4 +204,5 @@
     </div>
 
 </body>
-</html>
+                </html>
+                
