@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#000d1a">
-    <title>SK CLASSES | Target Board Study Platform</title>
+    <title>SK CLASSES | All-in-One Study Hub (18+ Portals)</title>
     
-    <!-- Firebase SDKs (Modular CDN) -->
+    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
@@ -26,183 +26,411 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
+        window.isUserVip = false;
+
+        // Check Local Storage so login doesn't ask repeatedly
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedUser = localStorage.getItem('sk_user_profile');
+            if (savedUser) {
+                const userObj = JSON.parse(savedUser);
+                applyUserLoginUI(userObj.name, userObj.email, userObj.photo);
+            }
+        });
+
         window.handleGoogleLogin = function() {
             signInWithPopup(auth, provider).then((result) => {
-                checkVipStatus(result.user);
+                const user = result.user;
+                const profile = {
+                    name: user.displayName || "Student",
+                    email: user.email,
+                    photo: user.photoURL || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                };
+                localStorage.setItem('sk_user_profile', JSON.stringify(profile));
+                applyUserLoginUI(profile.name, profile.email, profile.photo);
+                checkVipStatus(user.email);
             }).catch((error) => {
-                console.error("Popup Login Error", error);
+                alert("Google लॉगिन में समस्या: आप नीचे नाम डालकर सीधे लॉगिन कर सकते हैं।");
             });
         };
 
-        window.continueAsGuest = function() {
-            document.getElementById('loginModal').style.display = 'none';
-            document.getElementById('userEmailDisplay').innerText = "Guest Student";
-            document.getElementById('vipBadge').innerHTML = "👤 Free User";
+        window.handleQuickLogin = function() {
+            const nameInput = document.getElementById('quickName').value.trim();
+            const phoneInput = document.getElementById('quickPhone').value.trim();
+            if (!nameInput) {
+                alert("कृपया अपना नाम लिखें!");
+                return;
+            }
+            const profile = {
+                name: nameInput,
+                email: phoneInput ? phoneInput + "@skclasses.in" : "student@skclasses.in",
+                photo: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+            };
+            localStorage.setItem('sk_user_profile', JSON.stringify(profile));
+            applyUserLoginUI(profile.name, profile.email, profile.photo);
         };
 
+        function applyUserLoginUI(name, email, photo) {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('headerUserName').innerText = name.split(' ')[0];
+            document.getElementById('profileName').innerText = name;
+            document.getElementById('profileEmail').innerText = email;
+            document.getElementById('profileImg').src = photo;
+            document.getElementById('headerAvatar').src = photo;
+            checkVipStatus(email);
+        }
+
         window.handleLogout = function() {
-            signOut(auth).then(() => {
+            localStorage.removeItem('sk_user_profile');
+            signOut(auth).finally(() => {
                 location.reload();
             });
         };
 
         onAuthStateChanged(auth, async (user) => {
-            const loginModal = document.getElementById('loginModal');
             if (user) {
-                loginModal.style.display = 'none';
-                document.getElementById('userEmailDisplay').innerText = user.email;
-                await checkVipStatus(user);
+                const profile = {
+                    name: user.displayName || "Student",
+                    email: user.email,
+                    photo: user.photoURL || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                };
+                localStorage.setItem('sk_user_profile', JSON.stringify(profile));
+                applyUserLoginUI(profile.name, profile.email, profile.photo);
             }
         });
 
-        async function checkVipStatus(user) {
+        async function checkVipStatus(email) {
             try {
-                const docRef = doc(db, "vipUsers", user.email);
+                const docRef = doc(db, "vipUsers", email);
                 const docSnap = await getDoc(docRef);
-                const vipBadge = document.getElementById('vipBadge');
-                const adContainer = document.getElementById('adContainer');
-
                 if (docSnap.exists() && docSnap.data().isVip === true) {
-                    vipBadge.innerHTML = "⭐ VIP Member";
-                    vipBadge.style.background = "#ffd700";
-                    vipBadge.style.color = "#000";
-                    if(adContainer) adContainer.style.display = 'none';
-                } else {
-                    vipBadge.innerHTML = "🔒 Free User";
-                    if(adContainer) adContainer.style.display = 'block';
+                    window.isUserVip = true;
+                    document.getElementById('vipStatusBadge').innerHTML = "⭐ VIP Member (Ad-Free)";
+                    document.getElementById('vipStatusBadge').style.background = "#ffd700";
+                    document.getElementById('vipStatusBadge').style.color = "#000";
+                    document.getElementById('topAdBanner').style.display = 'none';
                 }
-            } catch(e) {
-                console.log("VIP Check skipped");
+            } catch (e) {
+                console.log("Standard user mode");
             }
         }
     </script>
 
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background: #000d1a; color: #fff; min-height: 100vh; display: flex; flex-direction: column; }
-        header { background: #001f3f; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #00ff88; }
-        .logo { font-size: 20px; font-weight: bold; color: #00ff88; }
-        .user-info { display: flex; align-items: center; gap: 10px; font-size: 14px; }
-        .logout-btn { background: #ff4d4d; border: none; padding: 5px 10px; color: white; border-radius: 4px; cursor: pointer; }
-        
-        .main-container { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; background: #000d1a; }
-        
-        .study-card {
-            background: #001f3f; padding: 30px; border-radius: 15px; border: 2px solid #00ff88;
-            max-width: 400px; width: 100%; box-shadow: 0 0 25px rgba(0, 255, 136, 0.2);
+        :root {
+            --bg: #000d1a;
+            --card: #001f3f;
+            --accent: #00ff88;
+            --gold: #ffd700;
+            --text: #ffffff;
         }
-        .study-card h1 { color: #00ff88; font-size: 24px; margin-bottom: 15px; }
-        .study-card p { color: #ccc; font-size: 14px; margin-bottom: 25px; }
-        .target-btn {
-            display: inline-block; background: #00ff88; color: #000; padding: 15px 25px; font-size: 18px;
-            font-weight: bold; text-decoration: none; border-radius: 8px; width: 100%; box-shadow: 0 4px 15px rgba(0,255,136,0.4);
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+        body { background: var(--bg); color: var(--text); padding-bottom: 70px; }
+
+        /* Header */
+        header {
+            background: rgba(0, 31, 63, 0.95); backdrop-filter: blur(10px);
+            padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--accent);
+        }
+        .brand { display: flex; align-items: center; gap: 8px; }
+        .brand h1 { font-size: 18px; color: var(--accent); letter-spacing: 0.5px; }
+        .ver-tag { background: #ff4d4d; color: #fff; font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .profile-pill {
+            display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.1);
+            padding: 4px 10px; border-radius: 20px; cursor: pointer; border: 1px solid rgba(0,255,136,0.4);
+        }
+        .profile-pill img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+        .profile-pill span { font-size: 13px; font-weight: 600; }
+
+        /* New Version Update Banner */
+        .update-banner {
+            background: linear-gradient(90deg, #003366, #005580);
+            margin: 12px; padding: 12px 15px; border-radius: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid #00ccff;
+        }
+        .update-info h4 { font-size: 14px; color: #00ffcc; }
+        .update-info p { font-size: 11px; color: #ddd; }
+        .download-btn {
+            background: var(--accent); color: #000; text-decoration: none;
+            padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: bold;
+            white-space: nowrap; box-shadow: 0 2px 10px rgba(0,255,136,0.3);
         }
 
-        /* Login Modal Overlay */
-        #loginModal {
+        /* Section Title */
+        .section-title {
+            padding: 10px 15px 5px; font-size: 15px; color: var(--accent);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* 18 Websites Grid */
+        .grid-container {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px;
+        }
+        @media (min-width: 600px) { .grid-container { grid-template-columns: repeat(3, 1fr); } }
+
+        .site-card {
+            background: var(--card); border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px; padding: 15px 12px; text-align: center;
+            cursor: pointer; transition: 0.2s; position: relative; overflow: hidden;
+        }
+        .site-card:active { transform: scale(0.97); border-color: var(--accent); }
+        .site-card.featured { border: 1.5px solid var(--accent); background: linear-gradient(145deg, #002b55, #001830); }
+        .badge-new {
+            position: absolute; top: 6px; right: 6px; background: var(--accent);
+            color: #000; font-size: 9px; font-weight: bold; padding: 2px 5px; border-radius: 4px;
+        }
+        .site-icon { font-size: 28px; margin-bottom: 8px; display: block; }
+        .site-title { font-size: 14px; font-weight: bold; color: #fff; margin-bottom: 4px; }
+        .site-desc { font-size: 11px; color: #aaa; }
+
+        /* Modals */
+        .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.95); display: flex; justify-content: center; align-items: center; z-index: 9999;
+            background: rgba(0, 0, 0, 0.92); display: none; justify-content: center; align-items: center; z-index: 9999;
+            padding: 15px;
         }
-        .login-card {
-            background: #001f3f; padding: 30px; border-radius: 12px; text-align: center; max-width: 350px; width: 90%;
-            border: 2px solid #00ff88; box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        .modal-box {
+            background: #001f3f; border: 2px solid var(--accent); border-radius: 14px;
+            padding: 25px 20px; width: 100%; max-width: 360px; text-align: center;
+            box-shadow: 0 0 25px rgba(0,255,136,0.25);
         }
-        .login-card h2 { margin-bottom: 10px; color: #00ff88; }
-        .login-card p { font-size: 14px; margin-bottom: 20px; color: #ccc; }
+        .modal-box h2 { color: var(--accent); margin-bottom: 8px; font-size: 20px; }
+        .modal-box p { font-size: 13px; color: #ccc; margin-bottom: 15px; }
+
+        .input-field {
+            width: 100%; padding: 11px; margin-bottom: 10px; border-radius: 6px;
+            border: 1px solid #444; background: #001226; color: #fff; font-size: 14px;
+        }
+        .primary-btn {
+            width: 100%; padding: 12px; background: var(--accent); color: #000;
+            border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; margin-bottom: 10px;
+        }
         .google-btn {
-            background: white; color: #333; border: none; padding: 12px 20px; font-size: 16px; font-weight: bold;
-            border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%;
-            margin-bottom: 10px;
-        }
-        .skip-btn {
-            background: transparent; color: #00ff88; border: 1px solid #00ff88; padding: 10px; width: 100%;
-            border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;
+            width: 100%; padding: 11px; background: #fff; color: #222;
+            border: none; border-radius: 6px; font-weight: bold; font-size: 14px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
         }
 
-        /* VIP Floating Bar & Modal */
-        .vip-bar { background: #111; padding: 10px; text-align: center; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #333; }
-        .vip-btn { background: #ffd700; color: #000; border: none; padding: 6px 15px; font-weight: bold; border-radius: 20px; cursor: pointer; }
-        
-        #vipModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 10000; }
-        .vip-modal-content { background: #111; padding: 25px; border-radius: 10px; text-align: center; max-width: 320px; width: 90%; border: 1px solid #ffd700; }
-        .vip-modal-content img { width: 150px; height: 150px; margin: 15px 0; background: white; padding: 5px; border-radius: 8px; }
-        .close-vip { background: #ff4d4d; color: white; border: none; padding: 5px 12px; margin-top: 15px; border-radius: 4px; cursor: pointer; }
-        .pay-link-btn { display: inline-block; background: #00ff88; color: #000; padding: 10px 15px; text-decoration: none; font-weight: bold; border-radius: 5px; margin-top: 10px; width: 100%; }
+        /* Ad Interstitial Modal (Tap Open Ad -> Back/Timer Open Auto Website) */
+        .timer-circle {
+            width: 60px; height: 60px; border-radius: 50%; border: 4px solid var(--gold);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: bold; color: var(--gold); margin: 15px auto;
+        }
+
+        /* Bottom VIP Bar */
+        .bottom-bar {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: #0b132b;
+            border-top: 1px solid #333; padding: 10px 15px;
+            display: flex; justify-content: space-between; align-items: center; z-index: 90;
+        }
+        .vip-btn {
+            background: var(--gold); color: #000; border: none; padding: 8px 16px;
+            border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Login Modal -->
-    <div id="loginModal">
-        <div class="login-card">
+    <!-- 1. LOGIN MODAL (Opens only once until logged out) -->
+    <div id="loginModal" class="modal-overlay" style="display: flex;">
+        <div class="modal-box">
             <h2>SK CLASSES</h2>
-            <p>पढ़ाई शुरू करने के लिए Google से लॉगिन करें या सीधे आगे बढ़ें।</p>
+            <p>एक बार लॉगिन करें और सभी 18+ स्टडी पोर्टल्स का फ्री उपयोग करें</p>
+            
+            <input type="text" id="quickName" class="input-field" placeholder="आपका पूरा नाम (उदा. सूरज कुमार)">
+            <input type="tel" id="quickPhone" class="input-field" placeholder="मोबाइल नंबर (वैकल्पिक)">
+            <button class="primary-btn" onclick="handleQuickLogin()">पढ़ाई शुरू करें (Login)</button>
+            
+            <div style="margin: 10px 0; font-size: 12px; color: #888;">— या —</div>
             
             <button class="google-btn" onclick="handleGoogleLogin()">
-                <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.63-.06-1.25-.19-1.84H9v3.48h4.84c-.21 1.12-.84 2.07-1.79 2.71v2.26h2.9c1.7-1.57 2.69-3.88 2.69-6.61z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.81.54-1.84.86-3.06.86-2.34 0-4.32-1.58-5.03-3.7H1v2.33C2.56 15.98 5.52 18 9 18z"/><path fill="#FBBC05" d="M3.97 10.75c-.18-.54-.28-1.12-.28-1.75s.1-1.21.28-1.75V4.92H1.04C.38 6.24 0 7.76 0 9.4s.38 3.16 1.04 4.48l2.93-2.31z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.59C13.47.89 11.43 0 9 0 5.52 0 2.56 2.02 1.04 4.92l2.93 2.33c.71-2.12 2.69-3.67 5.03-3.67z"/></svg>
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="G">
                 Google से लॉगिन करें
             </button>
-
-            <button class="skip-btn" onclick="continueAsGuest()">सीधे पढ़ाई शुरू करें (Guest)</button>
         </div>
     </div>
 
-    <!-- Top Navigation Header -->
+    <!-- 2. PROFILE MODAL -->
+    <div id="profileModal" class="modal-overlay">
+        <div class="modal-box">
+            <img id="profileImg" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" style="width:70px; height:70px; border-radius:50%; border:2px solid var(--accent); margin-bottom:10px;">
+            <h2 id="profileName">Student Name</h2>
+            <p id="profileEmail" style="margin-bottom: 10px;">student@skclasses.in</p>
+            <div id="vipStatusBadge" style="display:inline-block; padding:5px 12px; background:#333; border-radius:15px; font-size:12px; margin-bottom:20px;">
+                🔒 Free Account (Ads Active)
+            </div>
+            <button class="primary-btn" style="background:#ff4d4d; color:#fff;" onclick="handleLogout()">Logout (लॉगआउट करें)</button>
+            <button class="primary-btn" style="background:transparent; border:1px solid #666; color:#ccc;" onclick="document.getElementById('profileModal').style.display='none'">बंद करें</button>
+        </div>
+    </div>
+
+    <!-- 3. AD INTERSTITIAL MODAL (Tap Open Ad -> Back/Complete Auto Open Website) -->
+    <div id="adInterstitialModal" class="modal-overlay">
+        <div class="modal-box" style="border-color: var(--gold);">
+            <h2 style="color: var(--gold);">विज्ञापन लोड हो रहा है...</h2>
+            <p id="targetSiteLabel">वेबसाइट खुलने वाली है, कृपया प्रतीक्षा करें या बैक करें</p>
+            
+            <!-- Adsterra Banner Inside Interstitial -->
+            <div style="background:#000; padding:10px; border-radius:8px; margin:10px 0;">
+                <script type="text/javascript">
+                    atOptions = { 'key' : '32282661', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+                </script>
+                <script type="text/javascript" src="//asiafilm.org/4/4b7fbdede7b9efc77b75feac076153a9/invoke.js"></script>
+            </div>
+
+            <div class="timer-circle" id="adCountdown">3</div>
+            <button id="openNowBtn" class="primary-btn" style="background: var(--gold);" onclick="proceedToTargetSite()">अभी वेबसाइट खोलें ➔</button>
+        </div>
+    </div>
+
+    <!-- 4. VIP PASS MODAL -->
+    <div id="vipModal" class="modal-overlay">
+        <div class="modal-box" style="border-color: var(--gold);">
+            <h2 style="color: var(--gold);">⭐ VIP Pass खरीदें (₹5)</h2>
+            <p>बिना किसी विज्ञापन (Ad-Free) के सभी 18 वेबसाइट्स सीधे खोलें!</p>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=upi://pay?pa=7857840922@ybl&pn=SK%20Classes&am=5.00&cu=INR" style="background:#fff; padding:8px; border-radius:10px; margin:10px 0;" alt="QR Code">
+            <p style="color: var(--accent); font-size: 13px; margin-bottom: 12px;">UPI ID: <b>7857840922@ybl</b></p>
+            <a href="upi://pay?pa=7857840922@ybl&pn=SK%20Classes&am=5.00&cu=INR" class="primary-btn" style="display:block; text-decoration:none; background:var(--gold);">Direct Pay via UPI App</a>
+            <button class="primary-btn" style="background:#ff4d4d; color:#fff; margin-top:5px;" onclick="document.getElementById('vipModal').style.display='none'">बंद करें</button>
+        </div>
+    </div>
+
+    <!-- HEADER -->
     <header>
-        <div class="logo">SK CLASSES</div>
-        <div class="user-info">
-            <span id="vipBadge" style="font-size: 12px; padding: 3px 8px; background: #333; border-radius: 4px;">Loading...</span>
-            <span id="userEmailDisplay" style="font-size: 12px; color: #aaa;"></span>
-            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        <div class="brand">
+            <h1>SK CLASSES</h1>
+            <span class="ver-tag">v2.0 NEW</span>
+        </div>
+        <div class="header-right">
+            <div class="profile-pill" onclick="document.getElementById('profileModal').style.display='flex'">
+                <img id="headerAvatar" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="User">
+                <span id="headerUserName">Profile</span>
+            </div>
         </div>
     </header>
 
-    <!-- Main Content Area (Fixed Iframe Error) -->
-    <div class="main-container">
-        <!-- Adsterra Ad Banner -->
-        <div id="adContainer" style="margin-bottom: 20px; text-align:center;">
-            <script type="text/javascript">
-                atOptions = {
-                    'key' : '32282661',
-                    'format' : 'iframe',
-                    'height' : 50,
-                    'width' : 320,
-                    'params' : {}
-                };
-            </script>
-            <script type="text/javascript" src="//asiafilm.org/4/4b7fbdede7b9efc77b75feac076153a9/invoke.js"></script>
+    <!-- NEW VERSION DOWNLOAD LINK BANNER -->
+    <div class="update-banner">
+        <div class="update-info">
+            <h4>🚀 SK Classes New App v2.0</h4>
+            <p>फास्ट स्पीड और नए फीचर्स के लिए अपडेट करें</p>
         </div>
-
-        <div class="study-card">
-            <h1>Target Board Study</h1>
-            <p>कक्षा 10वीं और 11वीं के सभी नोट्स, क्विज़ और स्टडी मटीरियल यहाँ से एक्सेस करें।</p>
-            <a href="https://gb-study-targetboard.ai.studio/" target="_blank" class="target-btn">🚀 Target Board खोलें</a>
-        </div>
+        <a href="https://sk-classes-20.vercel.app/" target="_blank" class="download-btn">⬇ Download New</a>
     </div>
 
-    <!-- VIP Upgrade Bottom Bar -->
-    <div class="vip-bar">
-        <span style="font-size: 13px;">विज्ञापन हटाएं (Ad-Free) मात्र ₹5/ماه</span>
-        <button class="vip-btn" onclick="document.getElementById('vipModal').style.display='flex'">Buy VIP Pass</button>
+    <!-- TOP ADSTERRA BANNER -->
+    <div id="topAdBanner" style="text-align:center; padding: 5px;">
+        <script type="text/javascript">
+            atOptions = { 'key' : '32282661', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };
+        </script>
+        <script type="text/javascript" src="//asiafilm.org/4/4b7fbdede7b9efc77b75feac076153a9/invoke.js"></script>
     </div>
 
-    <!-- VIP QR Code & Payment Modal -->
-    <div id="vipModal">
-        <div class="vip-modal-content">
-            <h3>VIP Pass खरीदें (₹5)</h3>
-            <p style="font-size:13px; color:#aaa; margin-top:5px;">QR कोड स्कैन करें या नीचे दिए बटन से पेमेंट करें:</p>
-            
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=7857840922@ybl&pn=SK%20Classes&am=5.00&cu=INR" alt="UPI QR Code">
-            
-            <p style="font-size: 12px; color: #00ff88; word-break: break-all;">UPI ID: <b>7857840922@ybl</b></p>
-            
-            <a href="upi://pay?pa=7857840922@ybl&pn=SK%20Classes&am=5.00&cu=INR" class="pay-link-btn">Direct Pay via UPI App</a>
-            
-            <br>
-            <button class="close-vip" onclick="document.getElementById('vipModal').style.display='none'">बंद करें</button>
-        </div>
+    <!-- 18 STUDY WEBSITES SECTION -->
+    <div class="section-title">
+        <span>📚 सभी स्टडी पोर्टल्स (18 Websites)</span>
+        <span style="font-size:11px; color:#aaa;">Tap to Open</span>
     </div>
 
+    <div class="grid-container" id="websitesGrid">
+        <!-- Cards will be rendered by JS -->
+    </div>
+
+    <!-- BOTTOM VIP BAR -->
+    <div class="bottom-bar">
+        <span style="font-size: 12px; color: #ddd;">बिना विज्ञापन पढ़ाई के लिए:</span>
+        <button class="vip-btn" onclick="document.getElementById('vipModal').style.display='flex'">⭐ Buy VIP (₹5)</button>
+    </div>
+
+    <script>
+        // All 18 Study Websites List (Target Board + 17 Essential Bihar Board & Study Portals)
+        const studyWebsites = [
+            { name: "Target Board Study", desc: "Notes, Quiz & Live Classes", url: "https://gb-study-targetboard.ai.studio/", icon: "🎯", featured: true },
+            { name: "Bihar Board Official", desc: "BSEB Result, Admit Card & Notice", url: "http://biharboardonline.bihar.gov.in/", icon: "🏛️" },
+            { name: "NCERT Books & Sol.", desc: "Class 10th & 11th Hindi Medium", url: "https://ncert.nic.in/textbook.php", icon: "📖" },
+            { name: "SCERT Bihar E-Library", desc: "Bihar Board Official Textbooks", url: "https://bstbpc.gov.in/", icon: "📚" },
+            { name: "Class 10th VVI Quiz", desc: "All Subject Objective Test", url: "https://gb-study-targetboard.ai.studio/", icon: "📝" },
+            { name: "Class 11th Science", desc: "Physics, Chemistry, Bio Notes", url: "https://gb-study-targetboard.ai.studio/", icon: "🔬" },
+            { name: "Model Paper 2026", desc: "Official Exam Pattern Sets", url: "http://biharboardonline.bihar.gov.in/", icon: "📄" },
+            { name: "Question Bank", desc: "Previous 10 Years Papers", url: "https://gb-study-targetboard.ai.studio/", icon: "🗂️" },
+            { name: "Formula Sheet Hub", desc: "Math & Science All Formulas", url: "https://gb-study-targetboard.ai.studio/", icon: "📐" },
+            { name: "Diksha Portal", desc: "Govt Digital Learning App", url: "https://diksha.gov.in/", icon: "🎓" },
+            { name: "e-Shikshakosh Bihar", desc: "Student Portal & Attendance", url: "https://eshikshakosh.bihar.gov.in/", icon: "🏫" },
+            { name: "Medhasoft Bihar", desc: "Scholarship & Cycle/Poshak", url: "https://medhasoft.bih.nic.in/", icon: "💰" },
+            { name: "NSP Scholarship", desc: "National Scholarship Portal", url: "https://scholarships.gov.in/", icon: "🎖️" },
+            { name: "Spoken English", desc: "Daily Grammar & Vocabulary", url: "https://gb-study-targetboard.ai.studio/", icon: "🗣️" },
+            { name: "GK & Current Affairs", desc: "Bihar & India Daily Quiz", url: "https://gb-study-targetboard.ai.studio/", icon: "🌍" },
+            { name: "PDF Notes Maker", desc: "Create & Download Study PDF", url: "https://gb-study-targetboard.ai.studio/", icon: "📑" },
+            { name: "Sarkari Result Info", desc: "Latest Exam & Admission", url: "https://www.sarkariresult.com/", icon: "📢" },
+            { name: "SK Classes Support", desc: "Help, Doubt & VIP Activation", url: "https://sk-classes-20.vercel.app/", icon: "💬" }
+        ];
+
+        const grid = document.getElementById('websitesGrid');
+        studyWebsites.forEach((site) => {
+            const card = document.createElement('div');
+            card.className = `site-card ${site.featured ? 'featured' : ''}`;
+            card.innerHTML = `
+                ${site.featured ? '<span class="badge-new">NEW</span>' : ''}
+                <span class="site-icon">${site.icon}</span>
+                <div class="site-title">${site.name}</div>
+                <div class="site-desc">${site.desc}</div>
+            `;
+            card.onclick = () => handleSiteClick(site.name, site.url);
+            grid.appendChild(card);
+        });
+
+        let selectedUrl = "";
+        let countdownInterval = null;
+
+        // Tap Open Ad -> Back / Timer Auto Open Website Logic
+        function handleSiteClick(name, url) {
+            selectedUrl = url;
+
+            // If user is VIP, open immediately without ad
+            if (window.isUserVip) {
+                window.open(url, '_blank');
+                return;
+            }
+
+            // Show Ad Interstitial
+            const modal = document.getElementById('adInterstitialModal');
+            document.getElementById('targetSiteLabel').innerText = `"${name}" खुल रहा है...`;
+            modal.style.display = 'flex';
+
+            let timeLeft = 3;
+            const timerEl = document.getElementById('adCountdown');
+            timerEl.innerText = timeLeft;
+
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    proceedToTargetSite();
+                }
+            }, 1000);
+        }
+
+        function proceedToTargetSite() {
+            clearInterval(countdownInterval);
+            document.getElementById('adInterstitialModal').style.display = 'none';
+            if (selectedUrl) {
+                window.open(selectedUrl, '_blank');
+            }
+        }
+
+        // Auto open target website if user switches back to tab after viewing an ad
+        document.addEventListener("visibilitychange", function() {
+            const modal = document.getElementById('adInterstitialModal');
+            if (!document.hidden && modal.style.display === 'flex' && selectedUrl) {
+                proceedToTargetSite();
+            }
+        });
+    </script>
 </body>
-                </html>
-                
+</html>
