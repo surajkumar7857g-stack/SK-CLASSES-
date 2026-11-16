@@ -1,1 +1,574 @@
-Hello 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090d1c">
+<title>SK CLASSES | All in One Study Platform</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:radial-gradient(circle at top left,#30205e,transparent 35%),#080d1d;
+ color:#fff;
+ min-height:100vh
+}
+.hidden{display:none!important}
+button,input{font:inherit}
+button{cursor:pointer}
+header{
+ display:flex;justify-content:space-between;align-items:center;
+ padding:15px 5%;background:#10182eea;
+ border-bottom:1px solid #ffffff20;
+ position:sticky;top:0;z-index:5
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{
+ width:46px;height:46px;border-radius:14px;
+ display:grid;place-items:center;font-size:22px;font-weight:bold;
+ background:linear-gradient(135deg,#8b5cf6,#22d3ee)
+}
+.brand h2{font-size:19px;margin:0}
+.brand small{font-size:10px;color:#aab6d3;letter-spacing:1px}
+.btn{
+ border:0;border-radius:11px;padding:12px 17px;
+ color:white;font-weight:bold;
+ background:linear-gradient(110deg,#8b5cf6,#536dff)
+}
+.secondary{background:#ffffff12;border:1px solid #ffffff25}
+main{width:92%;max-width:1100px;margin:30px auto}
+.hero{text-align:center;padding:25px 0}
+.hero h1{font-size:clamp(28px,5vw,45px);margin:0 0 10px}
+.hero p{color:#aab6d3}
+.gradient{
+ background:linear-gradient(90deg,#c4a5ff,#22d3ee);
+ -webkit-background-clip:text;color:transparent
+}
+.toolbar{display:flex;gap:10px;margin:20px 0;flex-wrap:wrap}
+.toolbar input{
+ flex:1;min-width:180px;padding:13px;
+ border-radius:11px;background:#111a31;
+ border:1px solid #ffffff25;color:white
+}
+.grid{
+ display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+ gap:16px
+}
+.card{
+ background:linear-gradient(145deg,#172342,#10182c);
+ border:1px solid #ffffff20;border-radius:17px;
+ padding:17px;transition:.2s
+}
+.card:hover{transform:translateY(-4px);border-color:#8b5cf6}
+.cardtop{display:flex;align-items:center;gap:12px}
+.thumb{
+ width:46px;height:46px;border-radius:13px;
+ display:grid;place-items:center;font-weight:bold;
+ background:linear-gradient(135deg,#8b5cf6,#22d3ee)
+}
+.card h3{font-size:16px;margin:0 0 5px}
+.card small{color:#aab6d3}
+.actions{display:flex;gap:8px;margin-top:17px}
+.actions button{flex:1;padding:10px 6px;font-size:12px}
+.fav.active{color:#ff79b0;border-color:#ff79b0}
+.panel{
+ margin-top:25px;padding:20px;border-radius:17px;
+ background:#111a31;border:1px solid #ffffff20
+}
+.panel p{color:#aab6d3}
+footer{
+ text-align:center;padding:25px;color:#aab6d3;
+ border-top:1px solid #ffffff20
+}
+
+/* LOGIN SCREEN */
+#authScreen{
+ position:fixed;inset:0;z-index:20;
+ display:grid;place-items:center;padding:18px;
+ overflow:auto;
+ background:radial-gradient(circle at 20% 10%,#39216c,transparent 40%),
+ radial-gradient(circle at 90% 90%,#06465a,transparent 35%),#080d1d
+}
+.authbox{
+ width:min(430px,100%);padding:27px;
+ background:#111a31ed;border:1px solid #ffffff25;
+ border-radius:23px;box-shadow:0 25px 80px #0008
+}
+.authbrand{text-align:center;margin-bottom:22px}
+.authbrand .logo{margin:0 auto 12px;width:58px;height:58px}
+.authbrand h1{margin:0 0 5px}
+.authbrand p{font-size:11px;color:#aab6d3;letter-spacing:1px}
+.authbox h2{font-size:22px;margin-bottom:6px}
+.sub{font-size:13px;color:#aab6d3;margin-bottom:20px}
+.field{margin:13px 0}
+.field label{display:block;font-size:13px;margin-bottom:7px}
+.field input{
+ width:100%;padding:13px;border-radius:11px;
+ background:#080f22;border:1px solid #ffffff25;color:white;
+ outline:none
+}
+.field input:focus{border-color:#22d3ee}
+.wide{width:100%;margin-top:10px}
+.link{
+ border:0;background:none;color:#8fdff4;
+ text-decoration:underline;padding:5px;cursor:pointer
+}
+.switchline{text-align:center;color:#aab6d3;font-size:13px;margin-top:18px}
+.or{display:flex;align-items:center;gap:12px;color:#aab6d3;font-size:12px;margin:17px 0}
+.or:before,.or:after{content:"";height:1px;background:#ffffff25;flex:1}
+.message{font-size:13px;min-height:20px;margin-top:12px;color:#ffaaaa}
+.message.ok{color:#86efac}
+.fineprint{text-align:center;font-size:11px;color:#8190b2;margin-top:15px;line-height:1.5}
+#modal{
+ display:none;position:fixed;inset:0;z-index:15;
+ background:#000a;place-items:center;padding:18px
+}
+#modal.show{display:grid}
+.modalbox{
+ width:min(420px,100%);padding:23px;
+ background:#131e38;border:1px solid #ffffff25;border-radius:18px
+}
+.modalbox p{color:#aab6d3;line-height:1.5}
+@media(max-width:550px){
+ header{padding:13px 4%}
+ .brand h2{font-size:16px}
+ main{margin-top:15px}
+ .actions button{font-size:11px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN / REGISTER -->
+<div id="authScreen">
+ <div class="authbox">
+
+  <div class="authbrand">
+   <div class="logo">SK</div>
+   <h1>SK CLASSES</h1>
+   <p>ALL IN ONE STUDY PLATFORM</p>
+  </div>
+
+  <h2 id="authTitle">Welcome Back</h2>
+  <p class="sub" id="authSubtitle">Login to continue learning</p>
+
+  <form id="authForm">
+   <div class="field hidden" id="nameField">
+    <label>Full Name</label>
+    <input id="fullName" type="text" placeholder="Enter your name">
+   </div>
+
+   <div class="field">
+    <label>Email Address</label>
+    <input id="email" type="email" required
+    autocomplete="email" placeholder="Enter email">
+   </div>
+
+   <div class="field">
+    <label>Password</label>
+    <input id="password" type="password" required
+    minlength="6" autocomplete="current-password"
+    placeholder="Enter password">
+   </div>
+
+   <button class="btn wide" id="submitBtn" type="submit">
+    Login
+   </button>
+  </form>
+
+  <button class="link" id="forgotBtn" type="button">
+   Forgot Password?
+  </button>
+
+  <div class="or">OR</div>
+
+  <button class="btn secondary wide" id="googleBtn" type="button">
+   Continue with Google
+  </button>
+
+  <div class="switchline">
+   <span id="switchText">Don't have an account?</span>
+   <button class="link" id="switchBtn" type="button">
+    Create Account
+   </button>
+  </div>
+
+  <div class="message" id="authMessage"></div>
+
+  <div class="fineprint">
+   LEARN MORE • PAY LESS • GROW MORE<br>
+   Developer: SURAJ KUMAR
+  </div>
+
+ </div>
+</div>
+
+<!-- MAIN APP -->
+<header>
+ <div class="brand">
+  <div class="logo">SK</div>
+  <div>
+   <h2>SK CLASSES</h2>
+   <small>ALL IN ONE STUDY PLATFORM</small>
+  </div>
+ </div>
+ <button class="btn secondary hidden" id="logoutBtn">Logout</button>
+</header>
+
+<main>
+
+ <div class="hero">
+  <h1>Learn More. <span class="gradient">Grow More.</span></h1>
+  <p>All your study resources in one place.</p>
+ </div>
+
+ <div class="toolbar">
+  <input id="search" type="search" placeholder="Search study websites...">
+  <button class="btn secondary" id="favFilter">★ Favourites</button>
+  <button class="btn secondary" id="allFilter">All Sites</button>
+ </div>
+
+ <div class="grid" id="resourceGrid"></div>
+
+ <section class="panel">
+  <h3>📚 Study Materials & Downloads</h3>
+  <p>Open the shared study materials folder.</p>
+  <a href="https://drive.google.com/drive/folders/1KGP3sM8gJPsDYdBGKMoJmPVBXOtJ-hvs"
+  target="_blank" rel="noopener noreferrer">
+   <button class="btn">Open Download Folder</button>
+  </a>
+ </section>
+
+ <section class="panel">
+  <h3>About SK CLASSES</h3>
+  <p>LEARN MORE • PAY LESS • GROW MORE</p>
+  <p>Educational resource directory by SURAJ KUMAR.</p>
+ </section>
+
+</main>
+
+<footer>
+ © <span id="year"></span> SK CLASSES · Developer: SURAJ KUMAR
+</footer>
+
+<!-- WEBSITE CONFIRMATION -->
+<div id="modal">
+ <div class="modalbox">
+  <h3>Continue to Website</h3>
+  <p id="modalText">This is an external study resource.</p>
+  <button class="btn wide" id="continueBtn">Continue</button>
+  <button class="btn secondary wide" id="cancelBtn">Cancel</button>
+ </div>
+</div>
+
+<!-- FIREBASE SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+<script>
+
+/* FIREBASE CONFIG
+   IMPORTANT: If this API key is rejected, copy the current Web App
+   config from Firebase Console > Project Settings > General.
+*/
+const firebaseConfig = {
+ apiKey: "AIzaSyDVACDGpvklhbrfk1T3OklXWfVwDeZl1g0Q",
+ authDomain: "sk-classes-54c05.firebaseapp.com",
+ projectId: "sk-classes-54c05",
+ storageBucket: "sk-classes-54c05.firebasestorage.app",
+ messagingSenderId: "860484696863",
+ appId: "1:860484696863:web:017df1de4b3345807b8e"
+};
+
+/* STUDY WEBSITES */
+const resources = [
+ ["Study X Panda","SX","https://studyxpanda-tb.vercel.app/"],
+ ["Vidyagram","VA","https://learnbyakp.site/vidyagram"],
+ ["RWA Education","RW","https://rwa.toplixeducation.site/"],
+ ["AI Study Resource","AI","https://ais-pre-a5hvjqc66aerxlyco5jzkx-49225910278.asia-east1.run.app/"],
+ ["Gyan Boss","GB","https://gyanboss-tb-2310.vercel.app/"],
+ ["Target Board","TB","https://targetboard.free.nf/?i=2"],
+ ["PWX Study Bison","PB","https://pwx-studybison.space-z.ai/#/topic/6ad859b252ffaa38594697e4?batchId=6ad3171ee5c1353e75cb7689&subjectId=6ad32edb867e363148a90f1b"],
+ ["GB Documents","GD","https://gbdoc.vercel.app/"],
+ ["Ashraf CyberX","AC","https://ashrafcyberx-tb.vercel.app/"],
+ ["Arya Vidya","AV","http://AryaVidya.cc"],
+ ["Study Parcham","SP","http://Studyparcham.in"],
+ ["Him Apps","HA","https://himapps000122.vercel.app/index.html"],
+ ["GB Study Disha Online Classes","GD","https://gb-study-dishaonlineclasses2.ai.studio/"],
+ ["Code X Studys","CX","https://code-x-studys.vercel.app/"],
+ ["SK Classes","SK","https://sk-classes-1.vercel.app/"],
+ ["Study Ratna Akki","SR","https://studyratnaakki.netlify.app"],
+ ["Study Hulk","SH","http://studyhulk.vercel.app"],
+ ["Study Ratna Lite Bot","TG","https://t.me/Study_Ratna_LiteBot/app?mode=fullscreen"]
+];
+
+const $ = id => document.getElementById(id);
+let auth = null;
+let mode = "login";
+let currentUrl = "";
+let favourites = new Set();
+let onlyFav = false;
+
+function setMessage(msg,ok=false){
+ $("authMessage").textContent=msg;
+ $("authMessage").className="message"+(ok?" ok":"");
+}
+
+function setMode(next){
+ mode=next;
+ const reg=mode==="register";
+
+ $("authTitle").textContent=reg?"Create Account":"Welcome Back";
+ $("authSubtitle").textContent=reg?
+ "Register to access study resources":
+ "Login to continue learning";
+
+ $("nameField").classList.toggle("hidden",!reg);
+ $("fullName").required=reg;
+ $("submitBtn").textContent=reg?"Create Account":"Login";
+
+ $("switchText").textContent=reg?
+ "Already registered?":"Don't have an account?";
+
+ $("switchBtn").textContent=reg?"Login":"Create Account";
+ $("forgotBtn").classList.toggle("hidden",reg);
+
+ $("password").autocomplete=reg?
+ "new-password":"current-password";
+
+ setMessage("");
+}
+
+$("switchBtn").addEventListener("click",()=>{
+ setMode(mode==="login"?"register":"login");
+});
+
+/* EMAIL LOGIN AND REGISTRATION */
+$("authForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+
+ if(!auth){
+  setMessage("Firebase load nahi hua. Internet check karein.");
+  return;
+ }
+
+ const email=$("email").value.trim();
+ const password=$("password").value;
+ const name=$("fullName").value.trim();
+
+ $("submitBtn").disabled=true;
+ setMessage("Please wait...");
+
+ try{
+  if(mode==="register"){
+   const cred=await auth.createUserWithEmailAndPassword(email,password);
+   if(name) await cred.user.updateProfile({displayName:name});
+   setMessage("Account created successfully.",true);
+  }else{
+   await auth.signInWithEmailAndPassword(email,password);
+   setMessage("Login successful.",true);
+  }
+ }catch(err){
+  setMessage(friendlyError(err));
+ }finally{
+  $("submitBtn").disabled=false;
+ }
+});
+
+/* FORGOT PASSWORD */
+$("forgotBtn").addEventListener("click",async()=>{
+ const email=$("email").value.trim();
+
+ if(!email){
+  setMessage("Pehle email address enter karein.");
+  return;
+ }
+
+ try{
+  await auth.sendPasswordResetEmail(email);
+  setMessage("Password reset email bhej diya gaya hai.",true);
+ }catch(e){
+  setMessage(friendlyError(e));
+ }
+});
+
+/* GOOGLE LOGIN */
+$("googleBtn").addEventListener("click",async()=>{
+ if(!auth){
+  setMessage("Firebase load nahi hua.");
+  return;
+ }
+
+ const provider=new firebase.auth.GoogleAuthProvider();
+
+ try{
+  await auth.signInWithRedirect(provider);
+ }catch(e){
+  setMessage(friendlyError(e));
+ }
+});
+
+/* LOGOUT */
+$("logoutBtn").addEventListener("click",()=>{
+ if(auth) auth.signOut();
+});
+
+/* ERROR MESSAGES */
+function friendlyError(e){
+ const map={
+  "auth/invalid-email":"Email address sahi nahi hai.",
+  "auth/user-not-found":"Account nahi mila. Register karein.",
+  "auth/wrong-password":"Password galat hai.",
+  "auth/invalid-credential":"Email ya password galat hai.",
+  "auth/email-already-in-use":"Account pehle se bana hua hai. Login karein.",
+  "auth/weak-password":"Password kam se kam 6 characters ka hona chahiye.",
+  "auth/too-many-requests":"Bahut attempts hue. Thodi der baad try karein.",
+  "auth/unauthorized-domain":"Firebase Authorized Domains mein apna domain add karein.",
+  "auth/operation-not-allowed":"Firebase Console mein sign-in method enable karein.",
+  "auth/api-key-not-valid.-please-pass-a-valid-api-key.":"Firebase API Key invalid hai. Project Settings se exact Web API Key copy karein.",
+  "auth/network-request-failed":"Internet connection check karein."
+ };
+
+ return map[e.code]||("Firebase Error: "+(e.code||e.message));
+}
+
+/* RESOURCE CARDS */
+function escapeHtml(s){
+ return s.replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+ }[c]));
+}
+
+function render(){
+ const q=$("search").value.toLowerCase();
+
+ const list=resources.map((r,i)=>({
+  name:r[0],short:r[1],url:r[2],i
+ })).filter(r=>
+  (!onlyFav||favourites.has(r.i)) &&
+  (r.name.toLowerCase().includes(q)||r.url.toLowerCase().includes(q))
+ );
+
+ $("resourceGrid").innerHTML=list.map(r=>`
+  <article class="card">
+   <div class="cardtop">
+    <div class="thumb">${r.short}</div>
+    <div>
+     <h3>${escapeHtml(r.name)}</h3>
+     <small>Study Resource</small>
+    </div>
+   </div>
+   <div class="actions">
+    <button class="btn" data-open="${r.i}">Open Website ↗</button>
+    <button class="btn secondary fav ${favourites.has(r.i)?"active":""}"
+    data-fav="${r.i}">${favourites.has(r.i)?"♥":"♡"}</button>
+   </div>
+   <div style="margin-top:10px">
+    <button class="btn secondary" style="width:100%"
+    data-copy="${r.i}">Copy Link</button>
+   </div>
+  </article>
+ `).join("");
+
+ if(!list.length){
+  $("resourceGrid").innerHTML=
+  '<p style="color:#aab6d3">No resources found.</p>';
+ }
+}
+
+$("resourceGrid").addEventListener("click",async e=>{
+ const open=e.target.closest("[data-open]");
+ const fav=e.target.closest("[data-fav]");
+ const copy=e.target.closest("[data-copy]");
+
+ if(open){
+  const r=resources[Number(open.dataset.open)];
+  currentUrl=r[2];
+  $("modalText").textContent=
+  r[0]+" is an external website. Continue only if you trust this destination.";
+  $("modal").classList.add("show");
+ }
+
+ if(fav){
+  const i=Number(fav.dataset.fav);
+  favourites.has(i)?favourites.delete(i):favourites.add(i);
+  render();
+ }
+
+ if(copy){
+  const url=resources[Number(copy.dataset.copy)][2];
+  try{
+   await navigator.clipboard.writeText(url);
+   copy.textContent="Copied ✓";
+  }catch{
+   prompt("Copy this link:",url);
+  }
+ }
+});
+
+$("continueBtn").addEventListener("click",()=>{
+ if(currentUrl) window.open(currentUrl,"_blank","noopener,noreferrer");
+ $("modal").classList.remove("show");
+});
+
+$("cancelBtn").addEventListener("click",()=>{
+ $("modal").classList.remove("show");
+});
+
+$("modal").addEventListener("click",e=>{
+ if(e.target===$("modal")) $("modal").classList.remove("show");
+});
+
+$("search").addEventListener("input",render);
+
+$("favFilter").addEventListener("click",()=>{
+ onlyFav=true;
+ render();
+});
+
+$("allFilter").addEventListener("click",()=>{
+ onlyFav=false;
+ render();
+});
+
+$("year").textContent=new Date().getFullYear();
+render();
+
+/* FIREBASE INITIALIZATION */
+(function initFirebase(){
+ try{
+  if(!window.firebase){
+   setMessage("Firebase SDK load nahi hua. Internet check karein.");
+   return;
+  }
+
+  if(!firebase.apps.length){
+   firebase.initializeApp(firebaseConfig);
+  }
+
+  auth=firebase.auth();
+
+  auth.getRedirectResult().catch(e=>{
+   setMessage(friendlyError(e));
+  });
+
+  auth.onAuthStateChanged(user=>{
+   $("authScreen").classList.toggle("hidden",!!user);
+   $("logoutBtn").classList.toggle("hidden",!user);
+
+   if(!user) setMode("login");
+  });
+
+ }catch(e){
+  setMessage("Firebase setup error: "+e.message);
+ }
+})();
+
+</script>
+</body>
+    </html>
+    
