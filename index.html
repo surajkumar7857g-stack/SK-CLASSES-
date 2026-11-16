@@ -9,8 +9,8 @@
     <!-- Firebase SDKs (Modular CDN) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+        import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDummyKeyForSkClasses-Config54c05",
@@ -26,12 +26,14 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
+        // Ensure session stays persistent so user doesn't log out on reload
+        setPersistence(auth, browserLocalPersistence).catch((error) => {
+            console.error("Persistence error", error);
+        });
+
+        // Use Redirect method instead of Popup for mobile compatibility
         window.handleGoogleLogin = function() {
-            signInWithPopup(auth, provider).then((result) => {
-                checkVipStatus(result.user);
-            }).catch((error) => {
-                console.error("Login Error", error);
-            });
+            signInWithRedirect(auth, provider);
         };
 
         window.handleLogout = function() {
@@ -39,6 +41,15 @@
                 location.reload();
             });
         };
+
+        // Check redirect result when page loads back
+        getRedirectResult(auth).then((result) => {
+            if (result && result.user) {
+                checkVipStatus(result.user);
+            }
+        }).catch((error) => {
+            console.error("Redirect Login Error", error);
+        });
 
         onAuthStateChanged(auth, async (user) => {
             const loginModal = document.getElementById('loginModal');
@@ -109,7 +120,7 @@
 </head>
 <body>
 
-    <!-- Login Modal (Appears automatically on startup if not logged in) -->
+    <!-- Login Modal -->
     <div id="loginModal">
         <div class="login-card">
             <h2>SK CLASSES</h2>
@@ -131,9 +142,8 @@
         </div>
     </header>
 
-    <!-- Main App Content (Target Board Study Platform) -->
+    <!-- Main App Content -->
     <div class="main-container">
-        <!-- Adsterra Ad Banner / Wrapper -->
         <div id="adContainer" style="text-align:center; background:#111; padding:5px;">
             <script type="text/javascript">
                 atOptions = {
@@ -147,7 +157,6 @@
             <script type="text/javascript" src="//asiafilm.org/4/4b7fbdede7b9efc77b75feac076153a9/invoke.js"></script>
         </div>
 
-        <!-- Updated Iframe Link -->
         <iframe src="https://gb-study-targetboard.ai.studio/"></iframe>
     </div>
 
@@ -163,12 +172,10 @@
             <h3>VIP Pass खरीदें (₹5)</h3>
             <p style="font-size:13px; color:#aaa; margin-top:5px;">QR कोड स्कैन करें या नीचे दिए बटन से पेमेंट करें:</p>
             
-            <!-- QR Code Image Generator based on UPI -->
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=7857840922@ybl&pn=SK%20Classes&am=5.00&cu=INR" alt="UPI QR Code">
             
             <p style="font-size: 12px; color: #00ff88; word-break: break-all;">UPI ID: <b>7857840922@ybl</b></p>
             
-            <!-- Direct Payment Button for Mobile Apps -->
             <a href="upi://pay?pa=7857840922@ybl&pn=SK%20Classes&am=5.00&cu=INR" class="pay-link-btn">Direct Pay via UPI App</a>
             
             <br>
