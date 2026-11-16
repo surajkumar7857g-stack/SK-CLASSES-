@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090d1c">
+<title>SK CLASSES | All in One Study Platform</title>
+
+<!-- Firebase SDKs (CDN Version) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+<style>
+:root{
+--bg:#090d1c;
+--panel:rgba(20,29,53,.82);
+--text:#f5f7ff;
+--muted:#9eabc8;
+--line:rgba(255,255,255,.11);
+--accent:#a18cff;
+--cyan:#55d8ed;
+--gold:#ffd700;
+}
+
+*{box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+margin:0;
+min-height:100vh;
+color:var(--text);
+background:
+radial-gradient(ellipse at 12% 0%,#4a3b9660,transparent 38%),
+radial-gradient(ellipse at 100% 15%,#08718a38,transparent 34%),
+var(--bg);
+font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
+
+.app{
+width:min(1120px,calc(100% - 28px));
+margin:auto;
+padding:18px 0 32px;
+}
+
+.topbar{
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:4px 0 18px;
+flex-wrap:wrap;
+gap:10px;
+}
+
+.brand{
+display:flex;
+align-items:center;
+gap:10px;
+font-size:13px;
+font-weight:900;
+letter-spacing:.7px;
+}
+
+.mark{
+width:39px;
+height:39px;
+display:grid;
+place-items:center;
+border-radius:13px;
+background:linear-gradient(135deg,#a18cff,#42cfe8);
+box-shadow:0 7px 22px #7866ed66;
+color:#fff;
+font-weight:950;
+font-size:16px;
+}
+
+/* TOPBAR RIGHT ACTIONS */
+.top-actions {
+display: flex;
+align-items: center;
+gap: 10px;
+flex-wrap: wrap;
+}
+
+/* VIP BUTTON */
+.vip-btn {
+display: inline-flex;
+align-items: center;
+gap: 6px;
+padding: 9px 14px;
+background: linear-gradient(135deg, #ffd700, #ff8c00);
+color: #1a1a1a;
+border: none;
+border-radius: 999px;
+font-size: 11px;
+font-weight: 900;
+cursor: pointer;
+box-shadow: 0 4px 15px #ffd70044;
+transition: transform .2s;
+text-decoration: none;
+}
+.vip-btn:hover { transform: translateY(-2px); }
+
+.google-login-btn {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+padding: 9px 16px;
+background: #ffffff;
+color: #1a1a1a;
+border: none;
+border-radius: 999px;
+font-size: 12px;
+font-weight: 800;
+cursor: pointer;
+box-shadow: 0 4px 15px #0003;
+transition: transform .2s;
+}
+.google-login-btn:hover { transform: translateY(-2px); }
+
+.user-profile {
+display: none;
+align-items: center;
+gap: 8px;
+padding: 5px 12px 5px 5px;
+background: rgba(255,255,255,0.08);
+border: 1px solid var(--line);
+border-radius: 999px;
+font-size: 11px;
+font-weight: 700;
+}
+.user-profile img {
+width: 26px;
+height: 26px;
+border-radius: 50%;
+}
+
+.logout-btn {
+background: none;
+border: none;
+color: #ff8c8c;
+font-size: 10px;
+font-weight: 800;
+cursor: pointer;
+padding: 2px 6px;
+}
+
+.hero{
+text-align:center;
+padding:34px 18px 30px;
+border:1px solid var(--line);
+border-radius:27px;
+background:linear-gradient(120deg,#6a55c83b,#1aa9c32b),var(--panel);
+box-shadow:0 18px 48px #0005;
+animation:rise .6s both;
+}
+
+.eyebrow{
+display:inline-flex;
+align-items:center;
+gap:8px;
+padding:7px 12px;
+border:1px solid var(--line);
+border-radius:999px;
+background:#ffffff0b;
+color:#c5cbe0;
+font-size:10px;
+font-weight:850;
+letter-spacing:1.8px;
+}
+
+.dot{
+width:7px;
+height:7px;
+border-radius:50%;
+background:#5ce3b5;
+box-shadow:0 0 12px #5ce3b5;
+}
+
+h1{
+margin:17px 0 8px;
+font-size:clamp(38px,8vw,65px);
+font-weight:950;
+line-height:1;
+letter-spacing:-2.8px;
+}
+
+.gradient{
+background:linear-gradient(90deg,#b8aaff,#62e1ef);
+-webkit-background-clip:text;
+background-clip:text;
+color:transparent;
+}
+
+.subtitle{
+color:#c0c8df;
+font-size:12px;
+font-weight:800;
+letter-spacing:2.6px;
+}
+
+.tagline{
+margin:13px 0 0;
+color:var(--muted);
+font-size:12px;
+letter-spacing:1px;
+}
+
+.section{padding-top:28px}
+
+.section-head{
+display:flex;
+align-items:end;
+justify-content:space-between;
+gap:12px;
+margin:0 2px 15px;
+}
+
+.section-head h2{
+margin:0 0 4px;
+font-size:19px;
+}
+
+.section-head p{
+margin:0;
+color:var(--muted);
+font-size:12px;
+}
+
+.count{
+padding:7px 11px;
+border:1px solid var(--line);
+border-radius:999px;
+background:#ffffff08;
+color:var(--muted);
+font-size:11px;
+white-space:nowrap;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(3,minmax(0,1fr));
+gap:14px;
+}
+
+.site{
+display:flex;
+align-items:center;
+gap:13px;
+min-width:0;
+min-height:88px;
+padding:14px;
+text-decoration:none;
+color:var(--text);
+border:1px solid var(--line);
+border-radius:18px;
+background:var(--panel);
+box-shadow:0 8px 25px #0002;
+backdrop-filter:blur(14px);
+transition:transform .2s,border-color .2s,box-shadow .2s;
+animation:cardIn .45s both;
+cursor:pointer;
+}
+
+.site:hover{
+transform:translateY(-4px);
+border-color:#a18cff99;
+box-shadow:0 15px 32px #6152c32b;
+}
+
+.site:active{transform:scale(.985)}
+
+.site-icon{
+flex:0 0 45px;
+width:45px;
+height:45px;
+display:grid;
+place-items:center;
+border-radius:14px;
+color:white;
+font-size:13px;
+font-weight:950;
+background:linear-gradient(140deg,#927cff,#31bcd8);
+box-shadow:inset 0 1px #ffffff70,0 6px 15px #4e6fd044;
+}
+
+.site-info{
+min-width:0;
+flex:1;
+}
+
+.site-name{
+display:block;
+font-size:13px;
+font-weight:800;
+line-height:1.35;
+}
+
+.site-url{
+display:block;
+margin-top:5px;
+color:var(--muted);
+font-size:10px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.arrow{
+padding-left:3px;
+color:#b9adff;
+font-size:19px;
+}
+
+.update{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:18px;
+margin-top:32px;
+padding:22px;
+border:1px solid #a18cff66;
+border-radius:22px;
+background:linear-gradient(115deg,#6e5bd532,#20b9d32b),var(--panel);
+box-shadow:0 18px 48px #0005;
+}
+
+.update-info{
+display:flex;
+align-items:center;
+gap:14px;
+}
+
+.download-icon{
+width:48px;
+height:48px;
+flex:0 0 48px;
+display:grid;
+place-items:center;
+border-radius:15px;
+background:linear-gradient(135deg,#a18cff,#42d3e9);
+color:#fff;
+font-size:22px;
+}
+
+.update h2{
+margin:0 0 5px;
+font-size:16px;
+}
+
+.update p{
+margin:0;
+color:var(--muted);
+font-size:11px;
+line-height:1.5;
+}
+
+.download{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:13px 17px;
+border-radius:13px;
+text-decoration:none;
+color:#081323;
+background:linear-gradient(100deg,#b9aaff,#62deed);
+font-size:11px;
+font-weight:950;
+letter-spacing:.5px;
+white-space:nowrap;
+box-shadow:0 8px 22px #0003;
+transition:transform .2s;
+}
+
+.download:hover{transform:translateY(-3px)}
+
+/* MODALS (VIP & REDIRECT) */
+.modal-overlay{
+position:fixed;
+inset:0;
+background:rgba(5,8,18,.92);
+backdrop-filter:blur(14px);
+z-index:9999;
+display:none;
+align-items:center;
+justify-content:center;
+padding:18px;
+}
+
+.modal-card{
+width:100%;
+max-width:380px;
+background:linear-gradient(145deg,#131c36,#0c1224);
+border:1px solid #ffd70066;
+border-radius:24px;
+padding:26px 20px;
+text-align:center;
+box-shadow:0 24px 60px #0009;
+position:relative;
+}
+
+.modal-close{
+position:absolute;
+top:14px;
+right:16px;
+background:none;
+border:none;
+color:var(--muted);
+font-size:20px;
+cursor:pointer;
+}
+
+.modal-card h3{
+margin:10px 0 8px;
+font-size:20px;
+font-weight:900;
+}
+
+.modal-card p{
+margin:0 0 20px;
+color:var(--muted);
+font-size:13px;
+line-height:1.5;
+}
+
+.modal-btn{
+display:block;
+width:100%;
+padding:14px;
+border:none;
+border-radius:14px;
+font-size:13px;
+font-weight:900;
+letter-spacing:.5px;
+text-decoration:none;
+cursor:pointer;
+background:linear-gradient(135deg,#ffd700,#ff8c00);
+color:#081323;
+box-shadow:0 8px 24px #ffd70044;
+transition:transform .15s;
+margin-top:10px;
+}
+.modal-btn:active{transform:scale(.98)}
+
+footer{
+text-align:center;
+padding:26px 8px 3px;
+color:var(--muted);
+font-size:11px;
+line-height:1.8;
+}
+footer strong{color:var(--text)}
+
+@keyframes rise{
+from{opacity:0;transform:translateY(14px)}
+to{opacity:1;transform:translateY(0)}
+}
+@keyframes cardIn{
+from{opacity:0;transform:translateY(9px)}
+to{opacity:1;transform:translateY(0)}
+}
+
+@media(max-width:820px){
+.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:540px){
+.app{width:calc(100% - 22px);padding-top:10px;}
+.hero{padding:29px 14px 25px;border-radius:23px;}
+.grid{grid-template-columns:1fr;gap:10px;}
+.site{min-height:78px}
+.update{align-items:stretch;flex-direction:column;padding:18px;}
+.download{width:100%}
+.section-head h2{font-size:17px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="topbar">
+<div class="brand">
+<span class="mark">SK</span>
+<span>SK CLASSES / STUDY HUB</span>
+</div>
+
+<!-- ACTIONS: VIP BUTTON & GOOGLE LOGIN -->
+<div class="top-actions">
+<button class="vip-btn" onclick="openVipModal()">
+⭐ <span id="vip-btn-text">BUY VIP (₹5)</span>
+</button>
+
+<button id="google-login-btn" class="google-login-btn" onclick="loginWithGoogle()">
+<svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.95H1.14v3.15C3.15 21.36 7.21 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.25c-.25-.72-.38-1.49-.38-2.25s.13-1.53.38-2.25V6.6H1.14C.41 8.1 0 9.79 0 12s.41 3.9 1.14 5.4l4.14-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.21 0 3.15 2.64 1.14 6.6l4.14 3.15c.95-2.84 3.6-4.95 6.72-4.95z"/></svg>
+Sign in
+</button>
+
+<div id="user-profile" class="user-profile">
+<img id="user-img" src="" alt="User">
+<span id="user-name">User</span>
+<button class="logout-btn" onclick="logoutGoogle()">Logout</button>
+</div>
+</div>
+</div>
+
+<header class="hero">
+<div class="eyebrow">
+<span class="dot"></span>
+OFFICIAL STUDY PLATFORM
+</div>
+<h1><span class="gradient">SK CLASSES</span></h1>
+<div class="subtitle">ALL IN ONE STUDY PLATFORM</div>
+<p class="tagline">LEARN MORE &nbsp;•&nbsp; PAY LESS &nbsp;•&nbsp; GROW MORE</p>
+</header>
+
+<main class="section">
+<div class="section-head">
+<div>
+<h2>Study Websites</h2>
+<p>Tap any resource to open website</p>
+</div>
+<span class="count">18 RESOURCES</span>
+</div>
+
+<div class="grid" id="sites"></div>
+
+<section class="update">
+<div class="update-info">
+<div class="download-icon">↓</div>
+<div>
+<h2>New Update Download &amp; New Apps</h2>
+<p>Latest updates, new apps and downloads in one place.</p>
+</div>
+</div>
+<a class="download" href="https://drive.google.com/drive/folders/1KGP3sM8gJPsDYdBGKMoJmPVBXOtJ-hvs" target="_blank" rel="noopener noreferrer">
+OPEN DOWNLOADS ↗
+</a>
+</section>
+</main>
+
+<footer>
+App Name: <strong>SK CLASSES</strong><br>
+Developer: <strong>SURAJ KUMAR</strong><br>
+LEARN MORE • PAY LESS • GROW MORE
+</footer>
+
+</div>
+
+<!-- REDIRECT POPUP MODAL (For normal users with Ads) -->
+<div id="redirect-modal" class="modal-overlay">
+<div class="modal-card">
+<button class="modal-close" onclick="closeModal('redirect-modal')">✕</button>
+<h3 id="modal-title">Study Link Ready</h3>
+<p>Niche diye gaye button par click karke apni study website par jayein.</p>
+<a id="final-link-btn" class="modal-btn" href="#" target="_blank" rel="noopener noreferrer" onclick="closeModal('redirect-modal')" style="background:linear-gradient(100deg,#b9aaff,#62deed);color:#081323;">
+GO TO STUDY WEBSITE ↗
+</a>
+</div>
+</div>
+
+<!-- VIP PASS INFO MODAL -->
+<div id="vip-modal" class="modal-overlay">
+<div class="modal-card" style="border-color:#ffd700;">
+<button class="modal-close" onclick="closeModal('vip-modal')">✕</button>
+<h3 style="color:#ffd700;">⭐ SK CLASSES VIP PASS</h3>
+<p id="vip-modal-desc">Sirf <strong>₹5 / 1 Month</strong> mein Ads-Free padhai ka anand lein! Koi ad beech mein nahi aayega.</p>
+<div id="vip-payment-section">
+<p style="font-size:12px;color:#fff;background:rgba(255,255,255,0.06);padding:10px;border-radius:10px;margin-bottom:15px;">
+UPI ID: <strong style="color:#55d8ed;">7857840922@ybl</strong><br>
+Payment karne ke baad apna UTR/Transaction ID niche WhatsApp par bhejein taaki turant VIP activate ho sake.
+</p>
+<a href="https://wa.me/917857840922?text=Hello%20Sir,%20Maine%20SK%20Classes%20ka%20VIP%20Pass%20(₹5)%20lene%20ke%20liye%20payment%20kar%20diya%20hai.%20Ye%20raha%20mera%20Payment%20Screenshot/UTR:" class="modal-btn" target="_blank" rel="noopener noreferrer">
+PAY ₹5 &amp; SEND ON WHATSAPP ↗
+</a>
+</div>
+</div>
+</div>
+
+<!-- Firebase Modular SDK & App Logic -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDVACDGpvklhbrfk1T3OklwXfVDeZl1g0Q",
+    authDomain: "sk-classes-54c05.firebaseapp.com",
+    projectId: "sk-classes-54c05",
+    storageBucket: "sk-classes-54c05.firebasestorage.app",
+    messagingSenderId: "860484696863",
+    appId: "1:860484696863:web:a68d745e9ab3eebe7b8e2a",
+    measurementId: "G-H0RCPLBLKG"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let isVipUser = false;
+
+  window.loginWithGoogle = function() {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider).catch((error) => {
+      alert("Login failed: " + error.message);
+    });
+  };
+
+  window.logoutGoogle = function() {
+    signOut(auth);
+  };
+
+  // Check VIP status from Firestore database (linked with user email)
+  async function checkVipStatus(user) {
+    try {
+      const docRef = doc(db, "vipUsers", user.email);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const expiryDate = new Date(data.expiryDate);
+        if (new Date() < expiryDate) {
+          isVipUser = true;
+          document.getElementById("vip-btn-text").innerText = "VIP ACTIVE ⭐";
+          document.getElementById("vip-modal-desc").innerHTML = `<span style="color:#5ce3b5;font-weight:900;">Aapka VIP Pass Active hai!</span><br>expiry: ${expiryDate.toLocaleDateString()}`;
+          document.getElementById("vip-payment-section").style.display = "none";
+          return;
+        }
+      }
+    } catch (e) {
+      console.log("VIP check error:", e);
+    }
+    isVipUser = false;
+    document.getElementById("vip-btn-text").innerText = "BUY VIP (₹5)";
+    document.getElementById("vip-modal-desc").innerHTML = "Sirf <strong>₹5 / 1 Month</strong> mein Ads-Free padhai ka anand lein!";
+    document.getElementById("vip-payment-section").style.display = "block";
+  }
+
+  onAuthStateChanged(auth, async (user) => {
+    const loginBtn = document.getElementById("google-login-btn");
+    const profileDiv = document.getElementById("user-profile");
+    
+    if (user) {
+      loginBtn.style.display = "none";
+      profileDiv.style.display = "flex";
+      document.getElementById("user-img").src = user.photoURL || "https://via.placeholder.com/26";
+      document.getElementById("user-name").innerText = user.displayName ? user.displayName.split(" ")[0] : "User";
+      await checkVipStatus(user);
+    } else {
+      loginBtn.style.display = "inline-flex";
+      profileDiv.style.display = "none";
+      isVipUser = false;
+      document.getElementById("vip-btn-text").innerText = "BUY VIP (₹5)";
+    }
+  });
+
+  window.isUserVip = function() {
+    return isVipUser;
+  };
+</script>
+
+<script>
+// --- ADSTERRA & STUDY LINKS LOGIC ---
+const AD_LINK = "https://asiafilm.org/4/4b7fbdede7b9efc77b75feac076153a9";
+
+const resources = [
+["SX","Study X Panda","studyxpanda-tb.vercel.app","https://studyxpanda-tb.vercel.app/"],
+["VA","Vidyagram","learnbyakp.site/vidyagram","https://learnbyakp.site/vidyagram"],
+["RW","RWA Education","rwa.toplixeducation.site","https://rwa.toplixeducation.site/"],
+["AI","AI Study Resource","Google Cloud App","https://ais-pre-a5hvjqc66aerxlyco5jzkx-49225910278.asia-east1.run.app/"],
+["GB","Gyan Boss","gyanboss-tb-2310.vercel.app","https://gyanboss-tb-2310.vercel.app/"],
+["TB","Target Board","targetboard.free.nf","https://targetboard.free.nf/?i=2"],
+["PB","PWX Study Bison","pwx-studybison.space-z.ai","https://pwx-studybison.space-z.ai/#/topic/6ad859b252ffaa38594697e4?batchId=6ad3171ee5c1353e75cb7689&subjectId=6ad32edb867e363148a90f1b"],
+["GD","GB Documents","gbdoc.vercel.app","https://gbdoc.vercel.app/"],
+["AC","Ashraf CyberX","ashrafcyberx-tb.vercel.app","https://ashrafcyberx-tb.vercel.app/"],
+["AV","Arya Vidya","aryavidya.cc","http://AryaVidya.cc"],
+["SP","Study Parcham","studyparcham.in","http://Studyparcham.in"],
+["HA","Him Apps","himapps000122.vercel.app","https://himapps000122.vercel.app/index.html"],
+["GD","GB Study Disha Online Classes","gb-study-dishaonlineclasses2.ai.studio","https://gb-study-dishaonlineclasses2.ai.studio/"],
+["CX","Code X Studys","code-x-studys.vercel.app","https://code-x-studys.vercel.app/"],
+["SK","SK Classes","sk-classes-1.vercel.app","https://sk-classes-1.vercel.app/"],
+["SR","Study Ratna Akki","studyratnaakki.netlify.app","https://studyratnaakki.netlify.app"],
+["SH","Study Hulk","studyhulk.vercel.app","http://studyhulk.vercel.app"],
+["TG","Study Ratna Lite Bot","Telegram Mini App","https://t.me/Study_Ratna_LiteBot/app?mode=fullscreen"]
+];
+
+const container = document.getElementById("sites");
+
+container.innerHTML = resources.map(([icon,name,url,href],i)=>`
+<div
+class="site"
+style="animation-delay:${Math.min(i,12)*35}ms"
+onclick="handleResourceClick('${href}', '${name}')"
+role="button"
+tabindex="0">
+
+<span class="site-icon">${icon}</span>
+
+<span class="site-info">
+<span class="site-name">${name}</span>
+<span class="site-url">${url}</span>
+</span>
+
+<span class="arrow">↗</span>
+</div>
+`).join("");
+
+function handleResourceClick(studyUrl, siteName) {
+  // Agar user VIP hai, to ad nahi khulega, seedha website khulegi!
+  if (window.isUserVip && window.isUserVip()) {
+    window.open(studyUrl, "_blank", "noopener,noreferrer");
+    return;
+  }
+
+  // Normal user ke liye Adsterra ad + Redirect popup aayega
+  window.open(AD_LINK, "_blank", "noopener,noreferrer");
+  document.getElementById("modal-title").innerText = siteName;
+  document.getElementById("final-link-btn").href = studyUrl;
+  document.getElementById("redirect-modal").style.display = "flex";
+}
+
+function openVipModal() {
+  document.getElementById("vip-modal").style.display = "flex";
+}
+
+function closeModal(modalId) {
+  document.getElementById(modalId).style.display = "none";
+}
+</script>
+
+</body>
+</html>
